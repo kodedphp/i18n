@@ -1,13 +1,14 @@
 Koded - i18n
 ============
 
-[![CI](https://github.com/kodedphp/i18n/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/kodedphp/i18n/actions/workflows/ci.yml)
+[![CI](https://github.com/kodedphp/i18n/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/kodedphp/i18n/actions/workflows/ci.yaml)
 [![Latest Stable Version](https://img.shields.io/packagist/v/koded/i18n.svg)](https://packagist.org/packages/koded/i18n)
 [![Minimum PHP Version: 8.1](https://img.shields.io/badge/php-%3E%3D%208.1-8892BF.svg)](https://php.net/)
 
 A simple internationalization library with support for .po and .php translation files.
 
     composer require koded/i18n
+
 
 Translation files
 -----------------
