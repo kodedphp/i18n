@@ -4,9 +4,9 @@ namespace Koded\I18n;
 
 use Koded\Stdlib\Configuration;
 use Throwable;
+use function array_key_exists;
 use function getcwd;
 use function rtrim;
-use function sprintf;
 
 abstract class I18nCatalog
 {
@@ -20,7 +20,7 @@ abstract class I18nCatalog
         string        $locale)
     {
         $this->formatter = $formatter;
-        $this->directory = rtrim($directory, '/') . '/';
+        $this->directory = rtrim($directory, '/');
         $this->locale = $this->initialize($locale);
     }
 
@@ -35,6 +35,11 @@ abstract class I18nCatalog
         );
         if ($instance->supports($locale)) {
             return $instance;
+        }
+        if ($catalog !== ArrayCatalog::class) {
+            error_log(" > will try to switch to ArrayCatalog ($locale) ...");
+            $conf->set('translation.catalog', ArrayCatalog::class);
+            return static::new($conf);
         }
         // Fallback to NoCatalog
         return new NoCatalog(new $formatter, $directory, $locale);
@@ -78,8 +83,8 @@ abstract class I18nCatalog
     abstract protected function message(string $domain, string $string, int $n): string;
 
     /**
-     * Checks if the locale is supported by the catalog,
-     * or other specific requirements for the catalog.
+     * Checks if the locale is supported for this catalog,
+     * or other specific requirements.
      *
      * @param string $locale
      * @return bool
@@ -87,7 +92,8 @@ abstract class I18nCatalog
     abstract protected function supports(string $locale): bool;
 
     /**
-     * Initialize the catalog object.
+     * Initialize the catalog object. This method is
+     * called before supports().
      *
      * @param string $locale Desired locale to be initialized
      * @return string|false Returns the set locale,
@@ -127,19 +133,20 @@ class ArrayCatalog extends I18nCatalog
 
     protected function supports(string $locale): bool
     {
-        return is_readable($this->directory . $locale . '.php');
+        return $this->locale === $locale;
     }
 
     protected function initialize(string $locale): string|false
     {
         try {
-            $this->data = require($this->directory . $locale . '.php');
+            $this->data = require($catalog = "$this->directory/$locale.php");
+            if (false === array_key_exists('messages', $this->data)) {
+                error_log("i18n catalog $catalog is missing the messages array");
+                return false;
+            }
             return $locale;
         } catch (Throwable $e) {
-            error_log(sprintf(
-                    '[%s] Expects a catalog for %s. The error message was: %s',
-                    __CLASS__, $locale, $e->getMessage())
-            );
+            error_log($e->getMessage());
             return false;
         }
     }
