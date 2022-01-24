@@ -1,0 +1,8 @@
+*.php diff=php
+
+/tests         export-ignore
+/vendor        export-ignore
+/composer.lock export-ignore
+/*.git*        export-ignore
+/*.dist        export-ignore
+/*.yml         export-ignore

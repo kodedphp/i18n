@@ -1,0 +1,42 @@
+<?php
+
+namespace Tests\Koded\I18n\I18n;
+
+use Koded\I18n\{I18n, NoCatalog};
+
+class TranslationFunctionTest extends I18nTestCase
+{
+    private string $message = 'Quick brown %s jumps over the lazy %s';
+
+    public function test_translation_function()
+    {
+        $this->assertSame(
+            'Quick brown fox jumps over the lazy dog',
+            __($this->message, ['fox', 'dog']),
+            'Catalog is in a static registry, expecting translation');
+
+        $this->assertSame(
+            'Quick brown fox jumps over the lazy dog',
+            __($this->message, ['fox', 'dog'], 'en_US'),
+            'Catalog is in a static registry, expecting translation');
+
+        $this->assertSame(
+            $this->message,
+            __($this->message),
+            'No replacement arguments, return as-is');
+    }
+
+    public function test_translation_without_loaded_catalog()
+    {
+        $this->assertSame(
+            'Quick brown fox jumps over the lazy dog',
+            __($this->message, ['fox', 'dog'], 'de_DE'),
+            'No de_DE catalog, translated by using only the formatter and NoCatalog');
+
+        $this->assertInstanceOf(
+            NoCatalog::class,
+            I18n::catalogs()['de_DE'],
+            'No de_DE catalog, defaults to NoCatalog instance'
+        );
+    }
+}
