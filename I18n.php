@@ -74,7 +74,7 @@ class I18n
 
     public static function locale(): string
     {
-        return static::$locale ??= (fn() => static::normalizeLocale(\Locale::getDefault()))();
+        return static::$locale ??= static::normalizeLocale(\Locale::getDefault());
     }
 
     /**
@@ -100,7 +100,7 @@ class I18n
             ];
         }
         return [
-            'locale' => static::locale(),
+            'locale' => static::$locale,
             'catalogs' => $catalogs,
         ];
     }
@@ -110,13 +110,13 @@ class I18n
         bool        $asDefault = false): void
     {
         $locale = $catalog->locale();
-        static::$catalogs[$locale] = $catalog;
         if ($asDefault || empty(static::$catalogs)) {
             static::setDefaultLocale($locale);
             static::$directory = $catalog->directory();
             static::$formatter = $catalog->formatter()::class;
             static::$catalog = $catalog::class;
         }
+        static::$catalogs[$locale] = $catalog;
     }
 
     public static function flush(): void
@@ -145,7 +145,6 @@ class I18n
 
     private static function setDefaultLocale(string $locale): void
     {
-        error_log("Setting the default locale to $locale ...");
         static::$locale = $locale;
         ini_set('intl.default_locale', $locale);
         \Locale::setDefault($locale);
