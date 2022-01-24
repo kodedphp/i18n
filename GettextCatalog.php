@@ -8,7 +8,6 @@ use function dgettext;
 use function dngettext;
 use function extension_loaded;
 use function setlocale;
-use function str_contains;
 use function textdomain;
 
 final class GettextCatalog extends I18nCatalog
@@ -25,7 +24,7 @@ final class GettextCatalog extends I18nCatalog
 
     protected function supports(string $locale): bool
     {
-        return str_contains(setlocale(LC_MESSAGES, 0), $locale);
+        return $locale === $this->locale;
     }
 
     protected function initialize(string $locale): string|false
@@ -33,9 +32,13 @@ final class GettextCatalog extends I18nCatalog
         if (false === extension_loaded('gettext')) {
             return false;
         }
+        if (false === extension_loaded('intl')) {
+            return false;
+        }
         $this->bindDomain('messages');
-        setlocale(LC_MESSAGES, [$locale, "{$locale}.UTF8", "{$locale}.UTF-8"]);
-        return $locale;
+        return setlocale(LC_MESSAGES, [$locale, "$locale.UTF-8", "$locale.UTF8"])
+            ? $locale
+            : false;
     }
 
     private function bindDomain(string $domain): string
@@ -43,7 +46,7 @@ final class GettextCatalog extends I18nCatalog
         if (false === isset($this->domains[$domain])) {
             $this->directory = bindtextdomain($domain, $this->directory);
             $this->domains[$domain = textdomain($domain)] = true;
-            bind_textdomain_codeset($domain, 'UTF8');
+            bind_textdomain_codeset($domain, 'UTF-8');
         }
         return $domain;
     }
