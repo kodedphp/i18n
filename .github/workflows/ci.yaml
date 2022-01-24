@@ -9,7 +9,7 @@ on:
 jobs:
   tests:
     runs-on: ${{ matrix.os }}
-    name: Run unit tests PHP $PHP_VERSION
+    name: Run unit tests PHP ${{ matrix.php }}
     strategy:
       matrix:
         os: [ ubuntu-latest ]
