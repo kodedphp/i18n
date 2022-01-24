@@ -9,13 +9,16 @@ on:
 jobs:
   tests:
     runs-on: ${{ matrix.os }}
-    name: Run unit tests (${{ matrix.php }})
+    name: Run unit tests PHP ${{ env.PHP_VERSION }}
     strategy:
       matrix:
         os: [ ubuntu-latest ]
         php:
           - '8.1'
     steps:
+      - name: Setup locales
+        run: sudo locale-gen mk_MK.UTF-8 de_DE.UTF-8 it_IT.UTF-8
+
       - name: Checkout code
         uses: actions/checkout@v2
 
