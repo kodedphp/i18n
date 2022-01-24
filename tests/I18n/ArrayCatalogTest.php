@@ -18,7 +18,7 @@ class ArrayCatalogTest extends I18nTestCase
         $this->assertInstanceOf(
             ArrayCatalog::class,
             $catalog,
-            'The default catalog is an ArrayCatalog instance');
+            'The default catalog is ArrayCatalog instance');
 
         $this->assertSame(
             I18n::DEFAULT_LOCALE,
@@ -31,7 +31,7 @@ class ArrayCatalogTest extends I18nTestCase
             'The default message formatter is a DefaultFormatter instance');
 
         $this->assertStringContainsString(
-            '/Fixtures/',
+            '../Fixtures',
             $catalog->directory(),
             'The default path for translation files is set in configuration'
         );

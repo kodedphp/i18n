@@ -34,8 +34,6 @@ class LocaleTest extends TestCase
 
     protected function setUp(): void
     {
-        I18n::flush();
-
         $config = (new Config)
             ->set('translation.locale', 'mk_MK')
             ->set('translation.dir', __DIR__ . '/../Fixtures');
@@ -46,5 +44,10 @@ class LocaleTest extends TestCase
             ->set('translation.catalog', GettextCatalog::class)
             ->set('translation.locale', 'de_DE')
         ));
+    }
+
+    protected function tearDown(): void
+    {
+        I18n::flush();
     }
 }
