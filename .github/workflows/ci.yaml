@@ -18,7 +18,7 @@ jobs:
     steps:
       - name: Setup locales
         run: |
-          sudo locale-gen --purge mk_MK.UTF-8 de_DE.UTF-8 it_IT.UTF-8
+          sudo locale-gen mk_MK.UTF-8 de_DE.UTF-8 it_IT.UTF-8
           locale -a
 
       - name: Checkout code
