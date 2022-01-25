@@ -18,10 +18,7 @@ jobs:
     steps:
       - name: Setup locales
         run: |
-          echo "mk_MK.UTF-8 UTF-8" >> /etc/locale.gen
-          echo "de_DE.UTF-8 UTF-8" >> /etc/locale.gen
-          echo "it_IT.UTF-8 UTF-8" >> /etc/locale.gen
-          locale-gen
+          locale-gen --purge mk_MK.UTF-8 de_DE.UTF-8 it_IT.UTF-8
           locale -a
 
       - name: Checkout code
