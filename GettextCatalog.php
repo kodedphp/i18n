@@ -29,12 +29,14 @@ final class GettextCatalog extends I18nCatalog
 
     protected function initialize(string $locale): string|false
     {
+        // @codeCoverageIgnoreStart
         if (false === extension_loaded('gettext')) {
             return false;
         }
         if (false === extension_loaded('intl')) {
             return false;
         }
+        // @codeCoverageIgnoreEnd
         $this->bindDomain('messages');
         return setlocale(LC_MESSAGES, [$locale, "$locale.UTF-8", "$locale.UTF8"])
             ? $locale
