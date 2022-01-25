@@ -18,10 +18,12 @@ jobs:
     steps:
       - name: Setup locales
         run: |
-          sudo echo "mk_MK.UTF-8 UTF-8" >> /etc/locale.gen
-          sudo echo "de_DE.UTF-8 UTF-8" >> /etc/locale.gen
-          sudo echo "it_IT.UTF-8 UTF-8" >> /etc/locale.gen
-          sudo locale-gen
+          sudo su
+          touch /etc/locale.gen
+          echo "mk_MK.UTF-8 UTF-8" >> /etc/locale.gen
+          echo "de_DE.UTF-8 UTF-8" >> /etc/locale.gen
+          echo "it_IT.UTF-8 UTF-8" >> /etc/locale.gen
+          locale-gen
           locale -a
 
       - name: Checkout code
