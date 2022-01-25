@@ -31,18 +31,28 @@ abstract class I18nCatalog
         $instance = new $catalog(
             new $formatter,
             $directory = $conf->get('translation.dir', getcwd() . '/locales'),
-            $locale = $conf->get('translation.locale', I18n::DEFAULT_LOCALE)
+            $locale = self::normalizeLocale($conf->get('translation.locale', I18n::DEFAULT_LOCALE))
         );
         if ($instance->supports($locale)) {
             return $instance;
         }
         if ($catalog !== ArrayCatalog::class) {
-            error_log(" > ($locale) gettext not supported, try ArrayCatalog ...");
+            error_log(" > ($locale) gettext not supported, trying ArrayCatalog ...");
             $conf->set('translation.catalog', ArrayCatalog::class);
             return static::new($conf);
         }
         // Last resort, passthru
         return new NoCatalog(new $formatter, $directory, $locale);
+    }
+
+    public static function normalizeLocale(string $locale): string
+    {
+        $locale = str_replace('.', '_', $locale);
+        if (substr_count($locale, '_') > 1) {
+            $locale = explode('_', $locale);
+            $locale = "$locale[0]_$locale[1]";
+        }
+        return $locale;
     }
 
     public function translate(
@@ -114,6 +124,7 @@ class NoCatalog extends I18nCatalog
     {
         return true;
     }
+
     // @codeCoverageIgnoreEnd
 
     protected function initialize(string $locale): string|false
@@ -141,7 +152,7 @@ class ArrayCatalog extends I18nCatalog
         try {
             $this->data = require($catalog = "$this->directory/$locale.php");
             if (false === array_key_exists('messages', $this->data)) {
-                error_log("i18n catalog $catalog is missing the messages array");
+                error_log("ERROR : i18n catalog $catalog is missing the messages array");
                 return false;
             }
             return $locale;

@@ -4,10 +4,8 @@ namespace Koded\I18n;
 
 use Koded\Stdlib\Config;
 use Throwable;
-use function error_log;
 use function ini_set;
 use function strtr;
-use function substr_count;
 use function vsprintf;
 
 interface I18nFormatter
@@ -65,16 +63,16 @@ class I18n
         string $locale = null): string
     {
         try {
-            return static::$catalogs[$locale]->translate('messages', $string, $arguments);
+            return self::$catalogs[$locale]->translate('messages', $string, $arguments);
         } catch (Throwable) {
-            static::registerCatalog($locale ??= static::locale());
-            return static::$catalogs[$locale]->translate('messages', $string, $arguments);
+            self::registerCatalog($locale ??= self::locale());
+            return self::$catalogs[$locale]->translate('messages', $string, $arguments);
         }
     }
 
     public static function locale(): string
     {
-        return static::$locale ??= static::normalizeLocale(\Locale::getDefault());
+        return self::$locale ??= I18nCatalog::normalizeLocale(\Locale::getDefault());
     }
 
     /**
@@ -82,7 +80,7 @@ class I18n
      */
     public static function catalogs(): array
     {
-        return static::$catalogs;
+        return self::$catalogs;
     }
 
     /**
@@ -91,7 +89,7 @@ class I18n
     public static function info(): array
     {
         $catalogs = [];
-        foreach (static::$catalogs as $locale => $instance) {
+        foreach (self::$catalogs as $locale => $instance) {
             $catalogs[$locale] = [
                 'class' => $instance::class,
                 'formatter' => $instance->formatter()::class,
@@ -100,7 +98,7 @@ class I18n
             ];
         }
         return [
-            'locale' => static::$locale,
+            'locale' => self::$locale,
             'catalogs' => $catalogs,
         ];
     }
@@ -110,52 +108,43 @@ class I18n
         bool        $asDefault = false): void
     {
         $locale = $catalog->locale();
-        if ($asDefault || empty(static::$catalogs)) {
-            static::setDefaultLocale($locale);
-            static::$directory = $catalog->directory();
-            static::$formatter = $catalog->formatter()::class;
-            static::$catalog = $catalog::class;
+        if ($asDefault || empty(self::$catalogs)) {
+            self::setDefaultLocale($locale);
+            self::$directory = $catalog->directory();
+            self::$formatter = $catalog->formatter()::class;
+            self::$catalog = $catalog::class;
         }
-        static::$catalogs[$locale] = $catalog;
+        self::$catalogs[$locale] = $catalog;
     }
 
     public static function flush(): void
     {
-        static::$catalogs = [];
-        static::$directory = null;
-        static::$formatter = null;
-        static::$catalog = null;
-        static::$locale = null;
+        self::$catalogs = [];
+        self::$directory = null;
+        self::$formatter = null;
+        self::$catalog = null;
+        self::$locale = null;
         ini_set('intl.default_locale', '');
         \Locale::setDefault('');
     }
 
     private static function registerCatalog(string $locale): void
     {
-        if (isset(static::$catalogs[$locale])) {
+        if (isset(self::$catalogs[$locale])) {
             return;
         }
-        static::$catalogs[$locale] = I18nCatalog::new((new Config)
+        self::$catalogs[$locale] = I18nCatalog::new((new Config)
             ->set('translation.locale', $locale)
-            ->set('translation.dir', static::$directory)
-            ->set('translation.formatter', static::$formatter)
-            ->set('translation.catalog', static::$catalog)
+            ->set('translation.dir', self::$directory)
+            ->set('translation.formatter', self::$formatter)
+            ->set('translation.catalog', self::$catalog)
         );
     }
 
     private static function setDefaultLocale(string $locale): void
     {
-        static::$locale = $locale;
+        self::$locale = $locale;
         ini_set('intl.default_locale', $locale);
         \Locale::setDefault($locale);
-    }
-
-    private static function normalizeLocale(string $locale): string
-    {
-        if (substr_count($locale, '_') > 1) {
-            $locale = explode('_', $locale);
-            $locale = "$locale[0]_$locale[1]";
-        }
-        return $locale;
     }
 }

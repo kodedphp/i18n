@@ -6,21 +6,21 @@
          verbose="true"
          colors="true"
 >
-  <coverage>
-    <include>
-      <directory suffix=".php">./</directory>
-    </include>
-    <exclude>
-      <directory>vendor</directory>
-      <directory>tests</directory>
-    </exclude>
-  </coverage>
-  <testsuites>
-    <testsuite name="Koded I18n Test Suite">
-      <directory>./tests</directory>
-    </testsuite>
-  </testsuites>
-  <php>
-    <ini name="date.timezone" value="UTC"/>
-  </php>
+    <coverage>
+        <include>
+            <directory suffix=".php">./</directory>
+        </include>
+        <exclude>
+            <directory>vendor</directory>
+            <directory>tests</directory>
+        </exclude>
+    </coverage>
+    <testsuites>
+        <testsuite name="Koded I18n Test Suite">
+            <directory>./tests</directory>
+        </testsuite>
+    </testsuites>
+    <php>
+        <ini name="date.timezone" value="UTC"/>
+    </php>
 </phpunit>
