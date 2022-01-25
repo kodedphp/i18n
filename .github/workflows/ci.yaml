@@ -18,8 +18,11 @@ jobs:
     steps:
       - name: Setup locales
         run: |
-          sudo locale-gen --purge mk_MK.UTF-8 de_DE.UTF-8 it_IT.UTF-8
-          sudo locale -a
+          sudo echo "mk_MK.UTF-8 UTF-8" >> /etc/locale.gen
+          sudo echo "de_DE.UTF-8 UTF-8" >> /etc/locale.gen
+          sudo echo "it_IT.UTF-8 UTF-8" >> /etc/locale.gen
+          sudo locale-gen
+          locale -a
 
       - name: Checkout code
         uses: actions/checkout@v2
