@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Koded\I18n\I18n;
+namespace Tests\Koded\I18n\Unit;
 
 use Koded\I18n\{ArrayCatalog, GettextCatalog, I18n, I18nCatalog};
 use Koded\Stdlib\Config;
