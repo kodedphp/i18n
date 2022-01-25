@@ -18,6 +18,7 @@ jobs:
     steps:
       - name: Setup locales
         run: |
+          sudo rm -rvf /usr/lib/locale/*
           sudo locale-gen mk_MK.UTF-8 de_DE.UTF-8 it_IT.UTF-8
           locale -a
 
