@@ -37,11 +37,11 @@ abstract class I18nCatalog
             return $instance;
         }
         if ($catalog !== ArrayCatalog::class) {
-            error_log(" > will try to switch to ArrayCatalog ($locale) ...");
+            error_log(" > ($locale) gettext not supported, try ArrayCatalog ...");
             $conf->set('translation.catalog', ArrayCatalog::class);
             return static::new($conf);
         }
-        // Fallback to NoCatalog
+        // Last resort, passthru
         return new NoCatalog(new $formatter, $directory, $locale);
     }
 
