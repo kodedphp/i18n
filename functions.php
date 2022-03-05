@@ -5,7 +5,7 @@ use Koded\I18n\I18n;
 function __(
     string $string,
     array  $arguments = [],
-    string $locale = null): string
+    string $locale = ''): string
 {
-    return I18n::translate($string, $arguments, $locale);
+    return I18n::catalog($locale)->translate('messages', $string, $arguments);
 }
