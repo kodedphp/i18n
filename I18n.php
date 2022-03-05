@@ -3,8 +3,12 @@
 namespace Koded\I18n;
 
 use Koded\Stdlib\Config;
-use Throwable;
+use function array_combine;
+use function array_keys;
+use function array_map;
 use function ini_set;
+use function locale_get_default;
+use function locale_set_default;
 use function strtr;
 use function vsprintf;
 
@@ -36,6 +40,7 @@ final class DefaultFormatter implements I18nFormatter
     }
 }
 
+
 class I18n
 {
     public const DEFAULT_LOCALE = 'en_US';
@@ -60,19 +65,14 @@ class I18n
     public static function translate(
         string $string,
         array  $arguments = [],
-        string $locale = null): string
+        string $locale = ''): string
     {
-        try {
-            return self::$catalogs[$locale]->translate('messages', $string, $arguments);
-        } catch (Throwable) {
-            self::registerCatalog($locale ??= self::locale());
-            return self::$catalogs[$locale]->translate('messages', $string, $arguments);
-        }
+        return self::catalog($locale)->translate('messages', $string, $arguments);
     }
 
     public static function locale(): string
     {
-        return self::$locale ??= I18nCatalog::normalizeLocale(\Locale::getDefault());
+        return self::$locale ??= I18nCatalog::normalizeLocale(locale_get_default());
     }
 
     /**
@@ -81,6 +81,23 @@ class I18n
     public static function catalogs(): array
     {
         return self::$catalogs;
+    }
+
+    static public function catalog(string $locale): I18nCatalog
+    {
+        empty($locale) and $locale = self::locale();
+        return self::catalogs()[$locale] ?? self::registerCatalog($locale);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function languages(): array
+    {
+        return array_combine(
+            array_keys(self::$catalogs),
+            array_map(static fn(I18nCatalog $c) => $c->language(), self::$catalogs)
+        );
     }
 
     /**
@@ -125,15 +142,12 @@ class I18n
         self::$catalog = null;
         self::$locale = null;
         ini_set('intl.default_locale', '');
-        \Locale::setDefault('');
+        locale_set_default('');
     }
 
-    private static function registerCatalog(string $locale): void
+    private static function registerCatalog(string $locale): I18nCatalog
     {
-        if (isset(self::$catalogs[$locale])) {
-            return;
-        }
-        self::$catalogs[$locale] = I18nCatalog::new((new Config)
+        return self::$catalogs[$locale] = I18nCatalog::new((new Config)
             ->set('translation.locale', $locale)
             ->set('translation.dir', self::$directory)
             ->set('translation.formatter', self::$formatter)
@@ -145,6 +159,6 @@ class I18n
     {
         self::$locale = $locale;
         ini_set('intl.default_locale', $locale);
-        \Locale::setDefault($locale);
+        locale_set_default($locale);
     }
 }
