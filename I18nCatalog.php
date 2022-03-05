@@ -5,8 +5,11 @@ namespace Koded\I18n;
 use Koded\Stdlib\Configuration;
 use Throwable;
 use function array_key_exists;
+use function error_log;
 use function getcwd;
 use function rtrim;
+use function str_replace;
+use function strtolower;
 
 abstract class I18nCatalog
 {
@@ -30,7 +33,7 @@ abstract class I18nCatalog
         $formatter = $conf->get('translation.formatter', DefaultFormatter::class);
         $instance = new $catalog(
             new $formatter,
-            $directory = $conf->get('translation.dir', getcwd() . '/locales'),
+            $directory = $conf->get('translation.dir', getcwd() . '/locale'),
             $locale = self::normalizeLocale($conf->get('translation.locale', I18n::DEFAULT_LOCALE))
         );
         if ($instance->supports($locale)) {
@@ -47,12 +50,8 @@ abstract class I18nCatalog
 
     public static function normalizeLocale(string $locale): string
     {
-        $locale = str_replace('.', '_', $locale);
-        if (substr_count($locale, '_') > 1) {
-            $locale = explode('_', $locale);
-            $locale = "$locale[0]_$locale[1]";
-        }
-        return $locale;
+        $locale = explode('_', str_replace('.', '_', $locale));
+        return "$locale[0]_$locale[1]";
     }
 
     public function translate(
@@ -82,6 +81,19 @@ abstract class I18nCatalog
         return $this->formatter;
     }
 
+    public function urlized(): string
+    {
+        return str_replace('_', '-', strtolower($this->locale));
+    }
+
+    /**
+     * Returns the localized display name for catalog's language.
+     * Defaults to locale value if language value is not available.
+     *
+     * @return string
+     */
+    abstract public function language(): string;
+
     /**
      * Translates the message.
      *
@@ -90,7 +102,10 @@ abstract class I18nCatalog
      * @param int $n
      * @return string
      */
-    abstract protected function message(string $domain, string $string, int $n): string;
+    abstract protected function message(
+        string $domain,
+        string $string,
+        int $n): string;
 
     /**
      * Checks if the locale is supported for this catalog,
@@ -114,6 +129,11 @@ abstract class I18nCatalog
 
 class NoCatalog extends I18nCatalog
 {
+    public function language(): string
+    {
+        return $this->locale ?: '';
+    }
+
     protected function message(string $domain, string $string, int $n): string
     {
         return $string;
@@ -124,7 +144,6 @@ class NoCatalog extends I18nCatalog
     {
         return true;
     }
-
     // @codeCoverageIgnoreEnd
 
     protected function initialize(string $locale): string|false
@@ -136,6 +155,11 @@ class NoCatalog extends I18nCatalog
 class ArrayCatalog extends I18nCatalog
 {
     private array $data = [];
+
+    public function language(): string
+    {
+        return $this->data['language'] ?? $this->locale;
+    }
 
     protected function message(string $domain, string $string, int $n): string
     {
