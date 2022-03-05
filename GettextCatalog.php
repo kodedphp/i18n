@@ -7,12 +7,18 @@ use function bindtextdomain;
 use function dgettext;
 use function dngettext;
 use function extension_loaded;
+use function locale_get_display_language;
 use function setlocale;
 use function textdomain;
 
 final class GettextCatalog extends I18nCatalog
 {
     private array $domains = [];
+
+    public function language(): string
+    {
+        return locale_get_display_language($this->locale, $this->locale);
+    }
 
     protected function message(string $domain, string $string, int $n): string
     {
@@ -38,7 +44,7 @@ final class GettextCatalog extends I18nCatalog
         }
         // @codeCoverageIgnoreEnd
         $this->bindDomain('messages');
-        return setlocale(LC_MESSAGES, [$locale, "$locale.UTF-8", "$locale.UTF8"])
+        return setlocale(LC_MESSAGES, [$locale, "$locale.UTF-8", "$locale.utf8"])
             ? $locale
             : false;
     }
