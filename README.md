@@ -9,13 +9,47 @@ A simple internationalization library with support for .po and .php translation 
 
     composer require koded/i18n
 
+Requirements
+------------
+
+- intl
+- gettext
+
+Usage
+-----
+
+```php
+__(string $message, array $arguments => [], string $locale = null);
+```
+
+Configuration
+-------------
+
+The `I18n` class is static and should be configured 
+somewhere in the beginning of your PHP code/script.
+
+```php
+use Koded\Stdlib\Config;
+use Koded\I18n\{ArrayCatalog, DefaultFormatter, I18n, I18nCatalog};
+
+// all conf directives are optional
+$config = new Config([
+    'translation.catalog' => ArrayCatalog::class,
+    'translation.formatter' => DefaultFormatter::class,
+    'translation.dir' => '/path/to/your/translation/files',
+    'translation.locale' => ['mk+MK', 'de_DE', 'it_IT'],
+]);
+
+I18n::register(I18nCatalog::new($config));
+```
+
 
 Translation files
 -----------------
 
 ### .po files
 
-`poedit`
+`poedit` is a very good app to work with your translation files.
 
 ### .php files
 
@@ -26,11 +60,12 @@ return [
     'language' => '',
     'messages' => [
         // your translation strings goes here
+        'original string' => 'translated string',
     ]
 ];
 ```
 
-where `messages` contains `key => value` pairs for the translated strings. 
+where `messages` contains `key => value` pairs for the translated strings.
 
 Code quality
 ------------
