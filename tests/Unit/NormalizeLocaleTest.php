@@ -12,7 +12,7 @@ class NormalizeLocaleTest extends TestCase
 {
     public function test_should_normalize_locale()
     {
-        $this->assertSame('mk_MK', I18n::catalogs()['mk_MK']->locale(),
+        $this->assertSame('en_US', I18n::catalog('en_US')->locale(),
             'The locale is normalized');
     }
 
@@ -20,7 +20,7 @@ class NormalizeLocaleTest extends TestCase
     {
         I18n::register(I18nCatalog::new((new Config)
             ->set('translation.catalog', NoCatalog::class)
-            ->set('translation.locale', 'mk_MK_UTF8')
+            ->set('translation.locale', 'en_US_POSIX')
         ));
     }
 
