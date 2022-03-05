@@ -19,7 +19,7 @@ Usage
 -----
 
 ```php
-__(string $message, array $arguments => [], string $locale = null);
+__(string $message, array $arguments => [], string $locale = '');
 ```
 
 Configuration
@@ -37,7 +37,7 @@ $config = new Config([
     'translation.catalog' => ArrayCatalog::class,
     'translation.formatter' => DefaultFormatter::class,
     'translation.dir' => '/path/to/your/translation/files',
-    'translation.locale' => ['mk+MK', 'de_DE', 'it_IT'],
+    'translation.locale' => ['mk_MK', 'de_DE', 'it_IT'],
 ]);
 
 I18n::register(I18nCatalog::new($config));
