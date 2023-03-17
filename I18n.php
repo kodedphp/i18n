@@ -147,12 +147,12 @@ class I18n
 
     private static function registerCatalog(string $locale): I18nCatalog
     {
-        return self::$catalogs[$locale] = I18nCatalog::new((new Config)
-            ->set('translation.locale', $locale)
-            ->set('translation.dir', self::$directory)
-            ->set('translation.formatter', self::$formatter)
-            ->set('translation.catalog', self::$catalog)
-        );
+        return self::$catalogs[$locale] = I18nCatalog::new((new Config)->import([
+            'translation.locale' => $locale,
+            'translation.dir' => self::$directory,
+            'translation.formatter' => self::$formatter,
+            'translation.catalog' => self::$catalog,
+        ]));
     }
 
     private static function setDefaultLocale(string $locale): void
