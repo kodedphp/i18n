@@ -174,6 +174,7 @@ class ArrayCatalog extends I18nCatalog
     protected function initialize(string $locale): string|false
     {
         try {
+            /** @noinspection PhpIncludeInspection */
             $this->data = require($catalog = "$this->directory/$locale.php");
             if (false === array_key_exists('messages', $this->data)) {
                 error_log("ERROR : i18n catalog $catalog is missing the messages array");
