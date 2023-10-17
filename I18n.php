@@ -9,6 +9,7 @@ use function array_map;
 use function ini_set;
 use function locale_get_default;
 use function locale_set_default;
+use function str_replace;
 use function strtr;
 use function vsprintf;
 
@@ -28,7 +29,7 @@ final class StrtrFormatter implements I18nFormatter
 {
     public function format(string $string, array $arguments): string
     {
-        return $arguments ? strtr($string, $arguments) : $string;
+        return empty($arguments) ? $string : strtr($string, $arguments);
     }
 }
 
@@ -36,7 +37,23 @@ final class DefaultFormatter implements I18nFormatter
 {
     public function format(string $string, array $arguments): string
     {
-        return $arguments ? vsprintf($string, $arguments) : $string;
+        return empty($arguments) ? $string : vsprintf($string, $arguments);
+    }
+}
+
+final class CurlyFormatter implements I18nFormatter
+{
+    public function format(string $string, array $arguments): string
+    {
+        if (empty($arguments)) {
+            return $string;
+        }
+        $keys = $vals = [];
+        foreach ($arguments as $k => $v) {
+            $keys[] = "{{$k}}";
+            $vals[] = (string) $v;
+        }
+        return str_replace($keys, $vals, $string);
     }
 }
 
