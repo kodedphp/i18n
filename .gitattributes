@@ -1,6 +1,8 @@
 * text=auto eol=lf
 *.php diff=php
+*.md diff=markdown
 
+build/
 tests/        export-ignore
 *.git*        export-ignore
 *.dist        export-ignore
